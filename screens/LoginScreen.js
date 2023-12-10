@@ -12,20 +12,21 @@ import {
     Dimensions
 } from "react-native"
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants/colors'
 import PrimaryButton from "../components/PrimaryButton";
 
 const { width, height } = Dimensions.get("screen")
 
 export default function LoginScreen() {
-
+    const navigation = useNavigation()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
     return (
         <SafeAreaView style={{
             flex: 1,
-            backgroundColor: COLORS.white,
+            // backgroundColor: COLORS.white,
             alignItems: "center",
             marginTop: Platform.OS === "android" ? 40 : 0
         }}>
@@ -127,7 +128,9 @@ export default function LoginScreen() {
                         }}>
                             Don't have an account? 
                         </Text>
-                        <Pressable>
+                        <Pressable
+                            onPress={() => navigation.navigate("Register")}
+                        >
                             <Text style={{
                                 color: COLORS.text,
                                 textDecorationLine: "underline"

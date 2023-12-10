@@ -23,7 +23,9 @@ export default function PrimaryButton({text, size, onPressFnc}) {
             backgroundColor: COLORS.primaryColor,
             borderRadius: 8,
             paddingVertical: 14
-        }}>
+        }}
+            onPress={onPressFnc}
+        >
             <Text style={{
                 color: COLORS.white,
                 fontWeight: "bold",
