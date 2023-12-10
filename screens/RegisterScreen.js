@@ -25,14 +25,21 @@ export default function RegisterScreen() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         const user = {
-            "name": name,
-            "email": email,
-            "password": password,
-        }
-        axios.post("http://localhost:8000/register",user).then((response) => {
-            console.log(response)
+            name: name,
+            email: email,
+            password: password
+        };
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+                // Thêm các headers CORS khác nếu cần thiết
+            }
+        };
+
+        await axios.post("http://192.168.68.103:8000/register", user, config).then((response) => {
             Alert.alert(
                 "Register Successfull",
                 "You have registered successfull"
@@ -40,10 +47,26 @@ export default function RegisterScreen() {
             setName("")
             setEmail("")
             setPassword("")
-        }).catch((error)=>{
-            Alert.alert("Register Error:","An error occurred during registeration")
-            console.log("Registeraion failed", error.message)
-        }) 
+        }).catch((error) => {
+            // Alert.alert("Register Error:", "An error occurred during registeration")
+            // console.log("Registeraion failed", error)
+            if (error.response) {
+                // Nếu máy chủ trả về phản hồi, nhưng có mã trạng thái không phải 2xx
+                console.error("Response Data:", error.response.data);
+                console.error("Status Code:", error.response.status);
+                console.error("Headers:", error.response.headers);
+            } else if (error.request) {
+                // Nếu yêu cầu không nhận được phản hồi từ máy chủ
+                console.error("No response received:", error.request);
+            } else {
+                // Có lỗi xảy ra trong quá trình thiết lập yêu cầu
+                console.error("Request error:", error.message);
+            }
+    
+            // Hiển thị thông báo lỗi cho người dùng hoặc xử lý theo cách phù hợp với ứng dụng của bạn
+            Alert.alert("Register Error:", "An error occurred during registration");
+            console.log("Registration failed", error.message);
+        })
     }
 
     return (
@@ -79,7 +102,7 @@ export default function RegisterScreen() {
                         paddingHorizontal: 10,
                         borderRadius: 5,
                     }}>
-                        <FontAwesome  name="user" size={24} color="grey" />
+                        <FontAwesome name="user" size={24} color="grey" />
                         <TextInput
                             placeholder="enter your name"
                             value={name}
@@ -162,7 +185,7 @@ export default function RegisterScreen() {
                         width: "100%",
                         alignItems: "center",
                     }}>
-                        <PrimaryButton text="Register" size="medium" onPressFnc={handleRegister}/>
+                        <PrimaryButton text="Register" size="medium" onPressFnc={handleRegister} />
                     </View>
                     <View style={{
                         flexDirection: "row",

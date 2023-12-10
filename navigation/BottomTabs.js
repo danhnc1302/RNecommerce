@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/HomeScreen";
 import CartScreen from "../screens/CartScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-
+import { Ionicons, Entypo, AntDesign } from '@expo/vector-icons'
 const Tab = createBottomTabNavigator()
 
 export default function BottomTabs() {

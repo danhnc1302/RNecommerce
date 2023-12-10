@@ -3,16 +3,15 @@ const mongoose = require("mongoose")
 const crypto = require("crypto")
 const nodemailer = require("nodemailer")
 const bodyParser = require("body-parser")
+const cors = require("cors")
 const jwt = require("jsonwebtoken")
 
 const app = express()
 const PORT = 8000
 
-const cors = require("cors")
 app.use(cors())
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
-
 
 mongoose.connect("mongodb+srv://danhnc1302:danh@cluster0.1dd60po.mongodb.net/")
 .then(() => {
@@ -29,8 +28,6 @@ app.listen(PORT, () => {
 
 const User = require("./models/user")
 const Order = require("./models/order")
-
-
 
 //Function to send Verification Email to the user
 const sendVerificationEmail = async (email, verificationToken) => {
@@ -58,13 +55,6 @@ const sendVerificationEmail = async (email, verificationToken) => {
         console.log("Error sending verification email", error)
     }
 }
-
-// app.get("/register", async (req, res) => {
-
-//     console.log(req.body)
-
-//     console.log(res.body)
-// })
 
 //endpoint to register in the app
 app.post("/register", async (req, res) => {
@@ -130,3 +120,32 @@ app.get("/verify/:token", async (req, res) => {
     }
 });
 
+
+const generateSecretKey = () => {
+    const secretKey = crypto.randomBytes(32).toString('hex')
+    return secretKey
+}
+
+const secretKey = generateSecretKey()
+
+//endpoint to login in the app
+app.post("/login", async (req,res) => {
+    try {
+        const { email, password } = req.body
+        
+        //Check if the user existing
+        const user = await User.findOne({email})
+        if(!user) {
+            return res.status(401).json({message: "Invalid Email or Password"})
+        }
+        if(user.password != password) {
+            return res.status(401).json({message: "Invalid Password"})
+        }
+
+        //Generate a token
+        const token = jwt.sign({userId: user._id}, secretKey)
+        res.status(200).json({token})
+    } catch (error) {
+        res.status(500).json({message: "Login failed"})
+    }
+})

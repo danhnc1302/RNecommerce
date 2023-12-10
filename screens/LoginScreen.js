@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Text,
     View,
@@ -9,12 +9,15 @@ import {
     Platform,
     TextInput,
     Pressable,
-    Dimensions
+    Dimensions,
+    Alert
 } from "react-native"
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants/colors'
 import PrimaryButton from "../components/PrimaryButton";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("screen")
 
@@ -22,6 +25,46 @@ export default function LoginScreen() {
     const navigation = useNavigation()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+
+
+    useEffect(()=> {
+        const checkLoginState = async () => {
+            try {   
+                const token = await AsyncStorage.getItem("authToken")
+                if(token) {
+                    navigation.navigate("Main")
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        checkLoginState()
+    },[])
+
+    const handleLogin = async () => {
+        const user = {
+            email: email,
+            password: password
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+                // Thêm các headers CORS khác nếu cần thiết
+            }
+        }
+
+        await axios.post("http://192.168.68.103:8000/login", user, config).then((response) => {
+            console.log(response)
+            const token = response.data.token
+            AsyncStorage.setItem("authToken", token)
+            navigation.navigate("Main")
+        }).catch ((error) => {
+            Alert.alert("Login failed","Invalid Email")
+            console.log(error)
+        })
+    }
 
     return (
         <SafeAreaView style={{
@@ -117,7 +160,7 @@ export default function LoginScreen() {
                         width: "100%",
                         alignItems: "center",
                     }}>
-                        <PrimaryButton text="Login" size="medium" />
+                        <PrimaryButton text="Login" size="medium" onPressFnc={handleLogin}/>
                     </View>
                     <View style={{
                         flexDirection: "row",
