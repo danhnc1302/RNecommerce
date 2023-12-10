@@ -16,6 +16,7 @@ import { SliderBox } from 'react-native-image-slider-box'
 import { useNavigation } from '@react-navigation/native';
 import DropDownPicker from "react-native-dropdown-picker";
 import { BottomModal, SlideAnimation, ModalContent, ModalPortal } from "react-native-modals";
+import { useSelector, useDispatch } from "react-redux";
 import ProductItem from "../components/ProductItem";
 import axios from "axios";
 export default function HomeScreen() {
@@ -191,7 +192,7 @@ export default function HomeScreen() {
     ];
 
     const navigation = useNavigation()
-    const [modalVisible, setModalVisible] = useState(false)
+    const [modalVisible, setModalVisible] = useState(true)
     const [selectedAddress, setSelectedAdress] = useState("");
     const [products, setProducts] = useState([])
     const [addresses, setAddresses] = useState([]);
@@ -204,10 +205,6 @@ export default function HomeScreen() {
         { label: "electronics", value: "electronics" },
         { label: "women's clothing", value: "women's clothing" },
     ]);
-
-    const onGenderOpen = useCallback(() => {
-        setCompanyOpen(false);
-    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -222,6 +219,11 @@ export default function HomeScreen() {
         fetchData();
       }, []);
 
+    const onGenderOpen = useCallback(() => {
+        setCompanyOpen(false);
+    }, []);
+
+    const cart = useSelector((state) => state.cart.cart)
     return (
         <>
             <SafeAreaView
@@ -482,7 +484,7 @@ export default function HomeScreen() {
                     </View>
                 </ScrollView>
             </SafeAreaView>
-            <ModalPortal>
+            
                 <BottomModal
                     onBackdropPress={() => setModalVisible(!modalVisible)}
                     swipeDirection={["up", "down"]}
@@ -618,7 +620,6 @@ export default function HomeScreen() {
                         </View>
                     </ModalContent>
                 </BottomModal>
-            </ModalPortal>
         </>
 
     )
