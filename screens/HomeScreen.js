@@ -20,6 +20,8 @@ import { useSelector, useDispatch } from "react-redux";
 import ProductItem from "../components/ProductItem";
 import axios from "axios";
 import { UserType } from "../context/UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwt_decode from "jwt-decode";
 export default function HomeScreen() {
 
     const list = [
@@ -209,6 +211,16 @@ export default function HomeScreen() {
 
     const { userId, setUserId} = useContext(UserType)
 
+    useEffect(() => {
+        const fetchUser = async () => {
+          const token = await AsyncStorage.getItem("authToken");
+          const decodedToken = jwt_decode(token);
+          const userId = decodedToken.userId;
+          setUserId(userId);
+        };
+    
+        fetchUser();
+      }, []);
 
     useEffect(() => {
         fetchAddresses()
@@ -242,6 +254,8 @@ export default function HomeScreen() {
     const onGenderOpen = useCallback(() => {
         setCompanyOpen(false);
     }, []);
+
+    
 
     const cart = useSelector((state) => state.cart.cart)
 

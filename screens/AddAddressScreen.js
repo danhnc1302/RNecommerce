@@ -35,7 +35,7 @@ const AddAddressScreen = () => {
     }
   }
 
-  console.log(addresses)
+  console.log(userId)
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 50 }}>
