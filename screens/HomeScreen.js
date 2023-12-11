@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import {
     Text,
     View,
@@ -19,6 +19,7 @@ import { BottomModal, SlideAnimation, ModalContent, ModalPortal } from "react-na
 import { useSelector, useDispatch } from "react-redux";
 import ProductItem from "../components/ProductItem";
 import axios from "axios";
+import { UserType } from "../context/UserContext";
 export default function HomeScreen() {
 
     const list = [
@@ -192,7 +193,7 @@ export default function HomeScreen() {
     ];
 
     const navigation = useNavigation()
-    const [modalVisible, setModalVisible] = useState(true)
+    const [modalVisible, setModalVisible] = useState(false)
     const [selectedAddress, setSelectedAdress] = useState("");
     const [products, setProducts] = useState([])
     const [addresses, setAddresses] = useState([]);
@@ -206,6 +207,25 @@ export default function HomeScreen() {
         { label: "women's clothing", value: "women's clothing" },
     ]);
 
+    const { userId, setUserId} = useContext(UserType)
+
+
+    useEffect(() => {
+        fetchAddresses()
+      }, [userId, modalVisible])
+    
+      const fetchAddresses = async () => {
+        
+        try {
+          const response = await axios.get(`http://192.168.68.103:8000/addresses/${userId}`)
+          const {addresses} = response.data
+          setAddresses(addresses)
+    
+        } catch (error) {
+          console.log("error", error)
+        }
+      }
+
     useEffect(() => {
         const fetchData = async () => {
           try {
@@ -214,7 +234,7 @@ export default function HomeScreen() {
           } catch (error) {
             console.log("error message", error);
           }
-        };
+        };  
     
         fetchData();
       }, []);
@@ -224,6 +244,8 @@ export default function HomeScreen() {
     }, []);
 
     const cart = useSelector((state) => state.cart.cart)
+
+    console.log(addresses)
     return (
         <>
             <SafeAreaView
